@@ -25,3 +25,24 @@ export async function fetchTodayEntries(): Promise<Entry[]> {
 
   return result.documents as unknown as Entry[]
 }
+
+export async function fetchEntriesByRange(start: Date, end: Date): Promise<Entry[]> {
+  const all: Entry[] = []
+  const BATCH = 1000
+  let offset = 0
+
+  while (true) {
+    const result = await databases.listDocuments(DB_ID, COLLECTION_ID, [
+      Query.greaterThanEqual('$createdAt', start.toISOString()),
+      Query.lessThanEqual('$createdAt', end.toISOString()),
+      Query.orderAsc('$createdAt'),
+      Query.limit(BATCH),
+      Query.offset(offset),
+    ])
+    all.push(...(result.documents as unknown as Entry[]))
+    if (result.documents.length < BATCH) break
+    offset += BATCH
+  }
+
+  return all
+}
