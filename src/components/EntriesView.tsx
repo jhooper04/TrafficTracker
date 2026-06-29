@@ -4,6 +4,8 @@ import { databases, DB_ID, COLLECTION_ID, ID } from '../lib/appwrite'
 import VisitButtons from './VisitButtons'
 import EntriesTable from './EntriesTable'
 import EntryPanel from './EntryPanel'
+import SiteSwitch from './SiteSwitch'
+import ParkingCounter from './ParkingCounter'
 
 interface Props {
   entries: Entry[]
@@ -13,6 +15,7 @@ interface Props {
   onClosePanel: () => void
   onEntryCreated: (entry: Entry) => void
   onEntryUpdated: (entry: Entry) => void
+  userId: string
 }
 
 export default function EntriesView({
@@ -23,8 +26,10 @@ export default function EntriesView({
   onClosePanel,
   onEntryCreated,
   onEntryUpdated,
+  userId,
 }: Props) {
   const [adding, setAdding] = useState<VisitType | null>(null)
+  const [activeTab, setActiveTab] = useState<'visits' | 'operations'>('visits')
 
   const counts = useMemo(() => ({
     Boat: entries.filter(e => e.visit_type === 'Boat').length,
@@ -44,6 +49,8 @@ export default function EntriesView({
         vehicle_desc: '',
         contacted: 0,
         notes: '',
+        will_pay_online: false,
+        online_receipt_confirmed: false,
       })
       onEntryCreated(doc as unknown as Entry)
     } finally {
@@ -63,7 +70,30 @@ export default function EntriesView({
         </p>
       </div>
 
-      <VisitButtons counts={counts} onAdd={handleAdd} adding={adding} />
+      <div className="ops-tabs">
+        <div className="ops-tab-bar">
+          <button
+            className={`ops-tab${activeTab === 'visits' ? ' ops-tab--active' : ''}`}
+            onClick={() => setActiveTab('visits')}
+          >
+            Visits
+          </button>
+          <button
+            className={`ops-tab${activeTab === 'operations' ? ' ops-tab--active' : ''}`}
+            onClick={() => setActiveTab('operations')}
+          >
+            Operations
+          </button>
+        </div>
+        {activeTab === 'visits' ? (
+          <VisitButtons counts={counts} onAdd={handleAdd} adding={adding} />
+        ) : (
+          <div className="ops-panel">
+            <SiteSwitch userId={userId} />
+            <ParkingCounter />
+          </div>
+        )}
+      </div>
 
       {loadingEntries ? (
         <p className="loading-state">Loading entries…</p>

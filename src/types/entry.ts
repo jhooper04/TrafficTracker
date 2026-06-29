@@ -11,4 +11,6 @@ export interface Entry {
   vehicle_desc: string
   contacted: number
   notes: string
+  will_pay_online: boolean
+  online_receipt_confirmed: boolean
 }

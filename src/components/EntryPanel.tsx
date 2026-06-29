@@ -14,6 +14,8 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
   const [vehicleDesc, setVehicleDesc] = useState('')
   const [contacted, setContacted] = useState(0)
   const [notes, setNotes] = useState('')
+  const [willPayOnline, setWillPayOnline] = useState(false)
+  const [onlineReceiptConfirmed, setOnlineReceiptConfirmed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,6 +26,8 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
       setVehicleDesc(entry.vehicle_desc || '')
       setContacted(entry.contacted ?? 0)
       setNotes(entry.notes || '')
+      setWillPayOnline(entry.will_pay_online ?? false)
+      setOnlineReceiptConfirmed(entry.online_receipt_confirmed ?? false)
       setError('')
     }
   }, [entry])
@@ -40,6 +44,8 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
         vehicle_desc: vehicleDesc,
         contacted: Number(contacted),
         notes,
+        will_pay_online: willPayOnline,
+        online_receipt_confirmed: onlineReceiptConfirmed,
       })
       onSave(updated as unknown as Entry)
     } catch (err: unknown) {
@@ -65,60 +71,78 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
               <button className="panel-close" onClick={onClose} aria-label="Close">✕</button>
             </div>
             <form onSubmit={handleSubmit} className="panel-form">
-              <div className="form-row">
+              <div className="panel-form-body">
+                <div className="form-row">
+                  <label className="form-label">
+                    License Plate
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={plate}
+                      onChange={e => setPlate(e.target.value.toUpperCase())}
+                      placeholder="ABC1234"
+                    />
+                  </label>
+                  <label className="form-label">
+                    State
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={state}
+                      onChange={e => setState(e.target.value.toUpperCase())}
+                      placeholder="WA"
+                      maxLength={2}
+                    />
+                  </label>
+                </div>
                 <label className="form-label">
-                  License Plate
+                  Vehicle Description
                   <input
                     type="text"
                     className="form-input"
-                    value={plate}
-                    onChange={e => setPlate(e.target.value.toUpperCase())}
-                    placeholder="ABC1234"
+                    value={vehicleDesc}
+                    onChange={e => setVehicleDesc(e.target.value)}
+                    placeholder="Red pickup truck"
                   />
                 </label>
                 <label className="form-label">
-                  State
+                  People Contacted
                   <input
-                    type="text"
+                    type="number"
                     className="form-input"
-                    value={state}
-                    onChange={e => setState(e.target.value.toUpperCase())}
-                    placeholder="WA"
-                    maxLength={2}
+                    value={contacted}
+                    onChange={e => setContacted(Number(e.target.value))}
+                    min={0}
                   />
                 </label>
+                <label className="form-label">
+                  Notes
+                  <textarea
+                    className="form-input form-textarea"
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="Any additional notes…"
+                    rows={4}
+                  />
+                </label>
+                <label className="form-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={willPayOnline}
+                    onChange={e => setWillPayOnline(e.target.checked)}
+                  />
+                  Will Pay Online
+                </label>
+                <label className="form-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={onlineReceiptConfirmed}
+                    onChange={e => setOnlineReceiptConfirmed(e.target.checked)}
+                  />
+                  Online Receipt Confirmed
+                </label>
+                {error && <p className="form-error">{error}</p>}
               </div>
-              <label className="form-label">
-                Vehicle Description
-                <input
-                  type="text"
-                  className="form-input"
-                  value={vehicleDesc}
-                  onChange={e => setVehicleDesc(e.target.value)}
-                  placeholder="Red pickup truck"
-                />
-              </label>
-              <label className="form-label">
-                People Contacted
-                <input
-                  type="number"
-                  className="form-input"
-                  value={contacted}
-                  onChange={e => setContacted(Number(e.target.value))}
-                  min={0}
-                />
-              </label>
-              <label className="form-label">
-                Notes
-                <textarea
-                  className="form-input form-textarea"
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  placeholder="Any additional notes…"
-                  rows={4}
-                />
-              </label>
-              {error && <p className="form-error">{error}</p>}
               <div className="panel-actions">
                 <button type="button" className="btn btn--ghost" onClick={onClose}>
                   Cancel

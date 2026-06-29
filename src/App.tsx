@@ -78,6 +78,7 @@ export default function App() {
             onClosePanel={() => setSelectedEntry(null)}
             onEntryCreated={handleEntryCreated}
             onEntryUpdated={handleEntryUpdated}
+            userId={user.$id}
           />
         ) : (
           <ReportsView />
