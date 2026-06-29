@@ -19,6 +19,17 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const isOpen = entry !== null
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   useEffect(() => {
     if (entry) {
       setPlate(entry.license_plate || '')
@@ -54,8 +65,6 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
       setSaving(false)
     }
   }
-
-  const isOpen = entry !== null
 
   return (
     <>
