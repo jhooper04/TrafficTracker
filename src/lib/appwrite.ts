@@ -70,3 +70,49 @@ export async function fetchEntriesByRange(start: Date, end: Date): Promise<Entry
 
   return all
 }
+
+export async function fetchParkingLogsByRange(start: Date, end: Date): Promise<ParkingLog[]> {
+  const all: ParkingLog[] = []
+  const BATCH = 1000
+  let offset = 0
+
+  while (true) {
+    const result = await databases.listDocuments(DB_ID, PARKING_LOGS_COLLECTION_ID, [
+      Query.greaterThanEqual('$createdAt', start.toISOString()),
+      Query.lessThanEqual('$createdAt', end.toISOString()),
+      Query.orderAsc('$createdAt'),
+      Query.limit(BATCH),
+      Query.offset(offset),
+    ])
+    all.push(...(result.documents as unknown as ParkingLog[]))
+    if (result.documents.length < BATCH) break
+    offset += BATCH
+  }
+
+  return all
+}
+
+export async function fetchTimeLogsByRange(start: Date, end: Date): Promise<TimeLog[]> {
+  const all: TimeLog[] = []
+  const BATCH = 1000
+  let offset = 0
+
+  while (true) {
+    const result = await databases.listDocuments(DB_ID, TIME_LOGS_COLLECTION_ID, [
+      Query.greaterThanEqual('$createdAt', start.toISOString()),
+      Query.lessThanEqual('$createdAt', end.toISOString()),
+      Query.orderAsc('$createdAt'),
+      Query.limit(BATCH),
+      Query.offset(offset),
+    ])
+    all.push(...(result.documents as unknown as TimeLog[]))
+    if (result.documents.length < BATCH) break
+    offset += BATCH
+  }
+
+  return all
+}
+
+export async function deleteEntry(id: string): Promise<void> {
+  await databases.deleteDocument(DB_ID, COLLECTION_ID, id)
+}

@@ -4,13 +4,15 @@ interface Props {
   entries: Entry[]
   selectedId: string | null
   onRowClick: (entry: Entry) => void
+  onDelete: (id: string) => void
+  deletingId: string | null
 }
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function EntriesTable({ entries, selectedId, onRowClick }: Props) {
+export default function EntriesTable({ entries, selectedId, onRowClick, onDelete, deletingId }: Props) {
   if (entries.length === 0) {
     return <p className="empty-state">No entries yet today. Press a button above to add one.</p>
   }
@@ -27,6 +29,7 @@ export default function EntriesTable({ entries, selectedId, onRowClick }: Props)
             <th>Vehicle</th>
             <th>Contacted</th>
             <th>Notes</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +46,15 @@ export default function EntriesTable({ entries, selectedId, onRowClick }: Props)
               <td>{entry.vehicle_desc || '—'}</td>
               <td>{entry.contacted > 0 ? entry.contacted : '—'}</td>
               <td className="td-notes">{entry.notes || '—'}</td>
+              <td className="history-actions" onClick={e => e.stopPropagation()}>
+                <button
+                  className="btn btn--sm history-delete-btn"
+                  disabled={deletingId === entry.$id}
+                  onClick={() => onDelete(entry.$id)}
+                >
+                  {deletingId === entry.$id ? '…' : 'Delete'}
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

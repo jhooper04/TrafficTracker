@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
+import type { Role } from '../App'
 import type { Entry, VisitType } from '../types/entry'
-import { databases, DB_ID, COLLECTION_ID, ID } from '../lib/appwrite'
+import { databases, DB_ID, COLLECTION_ID, ID, deleteEntry } from '../lib/appwrite'
 import VisitButtons from './VisitButtons'
 import EntriesTable from './EntriesTable'
 import EntryPanel from './EntryPanel'
@@ -15,7 +16,9 @@ interface Props {
   onClosePanel: () => void
   onEntryCreated: (entry: Entry) => void
   onEntryUpdated: (entry: Entry) => void
+  onEntryDeleted: (id: string) => void
   userId: string
+  role: Role
 }
 
 export default function EntriesView({
@@ -26,10 +29,13 @@ export default function EntriesView({
   onClosePanel,
   onEntryCreated,
   onEntryUpdated,
+  onEntryDeleted,
   userId,
+  role,
 }: Props) {
   const [adding, setAdding] = useState<VisitType | null>(null)
   const [activeTab, setActiveTab] = useState<'visits' | 'operations'>('visits')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const counts = useMemo(() => ({
     Boat: entries.filter(e => e.visit_type === 'Boat').length,
@@ -55,6 +61,16 @@ export default function EntriesView({
       onEntryCreated(doc as unknown as Entry)
     } finally {
       setAdding(null)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    setDeletingId(id)
+    try {
+      await deleteEntry(id)
+      onEntryDeleted(id)
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -102,6 +118,8 @@ export default function EntriesView({
           entries={entries}
           selectedId={selectedEntry?.$id ?? null}
           onRowClick={onSelectEntry}
+          onDelete={handleDelete}
+          deletingId={deletingId}
         />
       )}
 
@@ -109,6 +127,7 @@ export default function EntriesView({
         entry={selectedEntry}
         onClose={onClosePanel}
         onSave={onEntryUpdated}
+        onDelete={role === 'manager' ? (id) => onEntryDeleted(id) : undefined}
       />
     </div>
   )

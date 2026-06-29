@@ -1,4 +1,4 @@
-type View = 'entries' | 'reports'
+type View = 'entries' | 'history' | 'reports'
 
 interface Props {
   view: View
@@ -16,6 +16,12 @@ export default function NavBar({ view, onViewChange, onLogout }: Props) {
           onClick={() => onViewChange('entries')}
         >
           Entries
+        </button>
+        <button
+          className={`nav-link ${view === 'history' ? 'nav-link--active' : ''}`}
+          onClick={() => onViewChange('history')}
+        >
+          History
         </button>
         <button
           className={`nav-link ${view === 'reports' ? 'nav-link--active' : ''}`}

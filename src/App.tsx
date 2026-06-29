@@ -5,9 +5,11 @@ import type { Entry } from './types/entry'
 import LoginForm from './components/LoginForm'
 import NavBar from './components/NavBar'
 import EntriesView from './components/EntriesView'
+import HistoryView from './components/HistoryView'
 import ReportsView from './components/ReportsView'
 
-type View = 'entries' | 'reports'
+type View = 'entries' | 'history' | 'reports'
+export type Role = 'host' | 'manager'
 
 export default function App() {
   const [authChecked, setAuthChecked] = useState(false)
@@ -59,11 +61,18 @@ export default function App() {
     setSelectedEntry(null)
   }
 
+  function handleEntryDeleted(id: string) {
+    setEntries(prev => prev.filter(e => e.$id !== id))
+    setSelectedEntry(null)
+  }
+
   if (!authChecked) return null
 
   if (!user) {
     return <LoginForm onLogin={handleLogin} />
   }
+
+  const role: Role = user.labels?.includes('BeadLakeManager') ? 'manager' : 'host'
 
   return (
     <div className="app">
@@ -78,8 +87,12 @@ export default function App() {
             onClosePanel={() => setSelectedEntry(null)}
             onEntryCreated={handleEntryCreated}
             onEntryUpdated={handleEntryUpdated}
+            onEntryDeleted={handleEntryDeleted}
             userId={user.$id}
+            role={role}
           />
+        ) : view === 'history' ? (
+          <HistoryView role={role} />
         ) : (
           <ReportsView />
         )}

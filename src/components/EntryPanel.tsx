@@ -1,14 +1,16 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import type { Entry } from '../types/entry'
-import { databases, DB_ID, COLLECTION_ID } from '../lib/appwrite'
+import { databases, DB_ID, COLLECTION_ID, deleteEntry } from '../lib/appwrite'
 
 interface Props {
   entry: Entry | null
   onClose: () => void
   onSave: (updated: Entry) => void
+  onDelete?: (id: string) => void
+  readOnly?: boolean
 }
 
-export default function EntryPanel({ entry, onClose, onSave }: Props) {
+export default function EntryPanel({ entry, onClose, onSave, onDelete, readOnly }: Props) {
   const [plate, setPlate] = useState('')
   const [state, setState] = useState('')
   const [vehicleDesc, setVehicleDesc] = useState('')
@@ -17,6 +19,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
   const [willPayOnline, setWillPayOnline] = useState(false)
   const [onlineReceiptConfirmed, setOnlineReceiptConfirmed] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
 
   const isOpen = entry !== null
@@ -66,6 +69,22 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
     }
   }
 
+  async function handleDelete() {
+    if (!entry) return
+    setDeleting(true)
+    setError('')
+    try {
+      await deleteEntry(entry.$id)
+      onDelete!(entry.$id)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Delete failed.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const busy = saving || deleting
+
   return (
     <>
       {isOpen && <div className="panel-backdrop" onClick={onClose} />}
@@ -90,6 +109,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                       value={plate}
                       onChange={e => setPlate(e.target.value.toUpperCase())}
                       placeholder="ABC1234"
+                      disabled={readOnly}
                     />
                   </label>
                   <label className="form-label">
@@ -101,6 +121,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                       onChange={e => setState(e.target.value.toUpperCase())}
                       placeholder="WA"
                       maxLength={2}
+                      disabled={readOnly}
                     />
                   </label>
                 </div>
@@ -112,6 +133,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                     value={vehicleDesc}
                     onChange={e => setVehicleDesc(e.target.value)}
                     placeholder="Red pickup truck"
+                    disabled={readOnly}
                   />
                 </label>
                 <label className="form-label">
@@ -122,6 +144,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                     value={contacted}
                     onChange={e => setContacted(Number(e.target.value))}
                     min={0}
+                    disabled={readOnly}
                   />
                 </label>
                 <label className="form-label">
@@ -132,6 +155,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                     onChange={e => setNotes(e.target.value)}
                     placeholder="Any additional notes…"
                     rows={4}
+                    disabled={readOnly}
                   />
                 </label>
                 <label className="form-checkbox">
@@ -139,6 +163,7 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                     type="checkbox"
                     checked={willPayOnline}
                     onChange={e => setWillPayOnline(e.target.checked)}
+                    disabled={readOnly}
                   />
                   Will Pay Online
                 </label>
@@ -147,19 +172,33 @@ export default function EntryPanel({ entry, onClose, onSave }: Props) {
                     type="checkbox"
                     checked={onlineReceiptConfirmed}
                     onChange={e => setOnlineReceiptConfirmed(e.target.checked)}
+                    disabled={readOnly}
                   />
                   Online Receipt Confirmed
                 </label>
                 {error && <p className="form-error">{error}</p>}
               </div>
-              <div className="panel-actions">
-                <button type="button" className="btn btn--ghost" onClick={onClose}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn--primary" disabled={saving}>
-                  {saving ? 'Saving…' : 'Save'}
-                </button>
-              </div>
+              {!readOnly && (
+                <div className="panel-actions">
+                  {onDelete && (
+                    <button
+                      type="button"
+                      className="btn btn--sm history-delete-btn"
+                      disabled={busy}
+                      onClick={handleDelete}
+                      style={{ marginRight: 'auto' }}
+                    >
+                      {deleting ? 'Deleting…' : 'Delete'}
+                    </button>
+                  )}
+                  <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn--primary" disabled={busy}>
+                    {saving ? 'Saving…' : 'Save'}
+                  </button>
+                </div>
+              )}
             </form>
           </>
         )}
