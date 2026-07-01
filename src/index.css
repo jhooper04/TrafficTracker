@@ -409,10 +409,14 @@ body {
 .td-mobile { display: none; }
 
 .td-action {
-  width: 1px;
-  padding-left: 6px !important;
-  padding-right: 10px !important;
   white-space: nowrap;
+}
+
+/* higher specificity than .entries-table td — no !important needed */
+.entries-table .td-action {
+  width: 1px;
+  padding-left: 6px;
+  padding-right: 10px;
 }
 
 .btn-icon {
@@ -827,8 +831,44 @@ body {
   text-align: center;
 }
 
+/* ── History table (standalone — shares no layout classes with .entries-table) ── */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
 .history-table td {
+  padding: 11px 14px;
+  color: var(--color-text);
   vertical-align: top;
+}
+
+.history-table tbody tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.history-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Time, type, and action columns shrink to content; details fills the rest */
+.history-table .td-time,
+.history-table .ht-type,
+.history-table .history-actions {
+  width: 1px;
+  white-space: nowrap;
 }
 
 .history-details {
@@ -1083,10 +1123,37 @@ body {
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .td-desktop { display: none; }
-  .td-mobile { display: table-cell; }
 
-  .entries-table td {
-    vertical-align: top;
+  /* Flex-based row layout — much more reliable than table-layout: fixed */
+  .entries-table thead { display: none; }
+  .entries-table,
+  .entries-table tbody { display: block; }
+
+  .entries-table tbody tr {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .entries-table td { padding: 0; }
+
+  .td-mobile {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .entries-table .td-time  { flex-shrink: 0; padding-top: 1px; }
+  .entries-table .td-type  { flex-shrink: 0; min-width: 100px; }
+  .entries-table .td-action { flex-shrink: 0; width: auto; padding: 0; }
+
+  .history-table .history-notes {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
   }
 
   .reports-view {

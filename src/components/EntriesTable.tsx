@@ -31,14 +31,14 @@ export default function EntriesTable({ entries, selectedId, onRowClick, onDelete
       <table className="entries-table">
         <thead>
           <tr>
-            <th>Time</th>
-            <th>Type</th>
+            <th className="td-time">Time</th>
+            <th className="td-type">Type</th>
             <th className="td-desktop">Plate</th>
             <th className="td-desktop">State</th>
             <th className="td-desktop">Vehicle</th>
             <th className="td-desktop">Contacted</th>
             <th className="td-desktop td-notes">Notes</th>
-            <th className="td-mobile"></th>
+            <th className="td-mobile">Details</th>
             <th></th>
           </tr>
         </thead>
@@ -50,7 +50,7 @@ export default function EntriesTable({ entries, selectedId, onRowClick, onDelete
               onClick={() => onRowClick(entry)}
             >
               <td className="td-time">{formatTime(entry.$createdAt)}</td>
-              <td><span className={`badge badge--${entry.visit_type.toLowerCase()}`}>{entry.visit_type}</span></td>
+              <td className="td-type"><span className={`badge badge--${entry.visit_type.toLowerCase()}`}>{entry.visit_type}</span></td>
 
               {/* Desktop-only columns */}
               <td className="td-desktop">{entry.license_plate || '—'}</td>

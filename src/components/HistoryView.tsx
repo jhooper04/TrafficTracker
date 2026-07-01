@@ -192,7 +192,7 @@ export default function HistoryView({ role }: Props) {
         <p className="empty-state">No activity for this period.</p>
       ) : (
         <div className="table-wrapper">
-          <table className="entries-table history-table">
+          <table className="history-table">
             <thead>
               <tr>
                 <th>Time</th>
@@ -254,7 +254,7 @@ function HistoryTableRow({ row, isManager, showDateCol, deletingId, onRowClick, 
       <tr className="table-row" onClick={() => onRowClick(entry)}>
         <td className="td-time">{time}</td>
         {showDateCol && <td className="td-time">{date}</td>}
-        <td>
+        <td className="ht-type">
           <span className={`badge badge--${entry.visit_type.toLowerCase()}`}>
             {entry.visit_type}
           </span>
@@ -294,7 +294,7 @@ function HistoryTableRow({ row, isManager, showDateCol, deletingId, onRowClick, 
       <tr>
         <td className="td-time">{time}</td>
         {showDateCol && <td className="td-time">{date}</td>}
-        <td><span className="badge badge--parking">Parking</span></td>
+        <td className="ht-type"><span className="badge badge--parking">Parking</span></td>
         <td className="history-details">
           <span className="history-meta">
             {log.action === 'increment' ? 'Spot occupied (+1)' : 'Spot freed (−1)'}
@@ -311,7 +311,7 @@ function HistoryTableRow({ row, isManager, showDateCol, deletingId, onRowClick, 
     <tr>
       <td className="td-time">{time}</td>
       {showDateCol && <td className="td-time">{date}</td>}
-      <td><span className="badge badge--clock">Clock</span></td>
+      <td className="ht-type"><span className="badge badge--clock">Clock</span></td>
       <td className="history-details">
         <span className="history-meta">
           {log.log_type === 'arrival' ? 'Clocked In' : 'Clocked Out'}
