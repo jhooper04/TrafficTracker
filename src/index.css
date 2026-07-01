@@ -405,6 +405,41 @@ body {
 .badge--parking { background: #fce7f3; color: #9d174d; }
 .badge--clock   { background: #f0fdf4; color: #166534; }
 
+/* ── Responsive table columns ── */
+.td-mobile { display: none; }
+
+.td-action {
+  width: 1px;
+  padding-left: 6px !important;
+  padding-right: 10px !important;
+  white-space: nowrap;
+}
+
+.btn-icon {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+
+.btn-icon:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-icon--danger:hover:not(:disabled) {
+  background: #fef2f2;
+  color: var(--color-danger);
+  border-color: #fecaca;
+}
+
 /* ── Empty / loading states ── */
 .empty-state, .loading-state {
   text-align: center;
@@ -1047,6 +1082,13 @@ body {
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+  .td-desktop { display: none; }
+  .td-mobile { display: table-cell; }
+
+  .entries-table td {
+    vertical-align: top;
+  }
+
   .reports-view {
     flex-direction: column;
     margin: -24px -16px;
@@ -1082,11 +1124,6 @@ body {
 @media (max-width: 600px) {
   .visit-buttons {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .entries-table th:nth-child(n+5),
-  .entries-table td:nth-child(n+5) {
-    display: none;
   }
 
   .main-content {
