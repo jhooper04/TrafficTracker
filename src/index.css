@@ -349,12 +349,15 @@ body {
 
 .entries-table td {
   padding: 11px 14px;
-  border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
   vertical-align: middle;
 }
 
-.entries-table tr:last-child td {
+.entries-table tbody tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.entries-table tbody tr:last-child {
   border-bottom: none;
 }
 
